@@ -1,0 +1,17 @@
+{
+  "name": "codeforce-monorepo",
+  "private": true,
+  "workspaces": ["apps/frontend", "apps/backend"],
+  "scripts": {
+    "dev": "concurrently -k -n frontend,backend -c magenta,cyan \"npm run start --workspace apps/frontend\" \"npm run start --workspace apps/backend\"",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "build": "npm run build --workspace apps/backend && npm run build --workspace apps/frontend",
+    "test": "npm run test --workspace apps/backend && npm run test --workspace apps/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "eslint": "^8.50.0",
+    "prettier": "^2.8.8"
+  }
+}
