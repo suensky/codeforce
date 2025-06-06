@@ -36,10 +36,10 @@ export class Cache {
     }
   }
 
-  private save() {
+  private async save() {
     const data: Record<string, Entry<any>> = {};
     this.lru.forEach((v, k) => (data[k] = v));
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    await fsPromises.writeFile(filePath, JSON.stringify(data, null, 2));
   }
 
   get<T>(key: string): T | undefined {
