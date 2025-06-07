@@ -1,13 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import Layout from '../components/Layout'; // Import the Layout component
+import { useAppTheme } from '../providers/AppThemeProvider'; // Import the theme hook
 
 export default function App() {
+  const { mode, toggleTheme } = useAppTheme();
+
   return (
-    <div>
-      <h1>Codeforce Metrics</h1>
-      <p>
-        <Link to="/user/1">Sample User Dashboard</Link>
-      </p>
-    </div>
+    <Layout currentThemeMode={mode} toggleTheme={toggleTheme}>
+      <Outlet /> {/* Child routes will render here */}
+    </Layout>
   );
 }

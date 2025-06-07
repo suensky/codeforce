@@ -6,7 +6,10 @@ import { Cache } from './services/Cache';
 const app = express();
 const port = process.env.PORT || 3000;
 
-const gitlab = new GitLabService();
+// Create a single shared cache instance
+const sharedCache = new Cache();
+
+const gitlab = new GitLabService(sharedCache); // Pass cache to GitLabService
 const metrics = new MetricsService(gitlab);
 
 app.get('/api/users/:id/contributions', async (req, res) => {
