@@ -63,11 +63,14 @@ export class GitLabService {
       const linkHeader = response.headers['link'];
       nextPageUrl = null; // Reset for next iteration
       if (linkHeader) {
-        const links = linkHeader.split(',').map(a => a.trim());
-        const nextLinkEntry = links.find(link => link.endsWith('rel="next"'));
-        if (nextLinkEntry) {
-          nextPageUrl = nextLinkEntry.substring(nextLinkEntry.indexOf('<') + 1, nextLinkEntry.indexOf('>'));
+        const linkPattern = /<([^>]+)>;\s*rel="([^"]+)"/g;
+        const links: Record<string, string> = {};
+        let match;
+        while ((match = linkPattern.exec(linkHeader)) !== null) {
+          const [_, url, rel] = match;
+          links[rel] = url;
         }
+        nextPageUrl = links['next'] || null;
       }
       pageNum++;
     }
