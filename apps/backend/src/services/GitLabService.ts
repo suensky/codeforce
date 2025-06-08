@@ -3,9 +3,9 @@ import { Cache } from './Cache';
 
 export class GitLabService {
   private axios: AxiosInstance;
-  private cache = new Cache();
+  // private cache = new Cache(); // Removed: instance will be injected
 
-  constructor() {
+  constructor(private cache: Cache) { // Accept Cache instance and declare as private member
     const token = process.env.GITLAB_PAT;
     this.axios = axios.create({
       baseURL: process.env.GITLAB_BASE_URL || 'https://gitlab.com/api/v4',
