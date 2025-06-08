@@ -14,10 +14,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} />
-          <Route path="/user/:id" element={<UserDashboard />} />
-          <Route path="/project/:id" element={<ProjectDashboard />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryProvider>
+            <Route path="/user/:id" element={<UserDashboard />} />
+           <Route path="/project/:id" element={<ProjectDashboard />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryProvider>
+    </AppThemeProvider>
   </React.StrictMode>,
 );
