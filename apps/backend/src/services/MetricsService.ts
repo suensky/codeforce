@@ -132,27 +132,23 @@ export class MetricsService {
 
     // Calculate Lines Added/Deleted from user's merged MRs
     // We use `mergedMRs` which are MRs *authored* by the user and are in 'merged' state.
-    const mrDetailsPromises = (mergedMRs as GitLabMergeRequest[]).map(async (mr) => {
+    for (const mr of mergedMRs as GitLabMergeRequest[]) {
+      // Fetch detailed MR info which includes diff_stats (additions/deletions)
+      // The getMergeRequestDetails endpoint is more suitable for this than getMergeRequestCommits
       try {
         const mrDetails = await this.gitlab.getMergeRequestDetails(String(mr.project_id), String(mr.iid), refresh);
-        return mrDetails;
+        if (mrDetails && mrDetails.diff_stats) {
+          linesAdded += mrDetails.diff_stats.additions;
+          linesDeleted += mrDetails.diff_stats.deletions;
+        } else if (mrDetails && mrDetails.changes_count) {
+          // Fallback: some MR objects might have 'changes_count' (lines changed) but not split additions/deletions.
+          // This is not ideal. 'diff_stats' from 'compute_metrics=true' is preferred.
+          // If only changes_count is available, we can't accurately get linesAdded/deleted.
+          // The `getMergeRequestDetails` method already includes `compute_metrics=true`.
+        }
       } catch (error) {
         console.error(`Error fetching details for MR ${mr.project_id}!${mr.iid}:`, error);
-        return null; // Return null for failed requests to handle them gracefully
-      }
-    });
-
-    const mrDetailsResults = await Promise.all(mrDetailsPromises);
-
-    for (const mrDetails of mrDetailsResults) {
-      if (mrDetails && mrDetails.diff_stats) {
-        linesAdded += mrDetails.diff_stats.additions;
-        linesDeleted += mrDetails.diff_stats.deletions;
-      } else if (mrDetails && mrDetails.changes_count) {
-        // Fallback: some MR objects might have 'changes_count' (lines changed) but not split additions/deletions.
-        // This is not ideal. 'diff_stats' from 'compute_metrics=true' is preferred.
-        // If only changes_count is available, we can't accurately get linesAdded/deleted.
-        // The `getMergeRequestDetails` method already includes `compute_metrics=true`.
+        // Decide how to handle: skip, retry, or log. For now, log and skip.
       }
     }
 
